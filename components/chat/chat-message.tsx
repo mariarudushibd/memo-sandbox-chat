@@ -8,10 +8,10 @@ import { CalculatorCard } from '@/components/ui/calculator-card';
 import { DateTimeCard } from '@/components/ui/datetime-card';
 import { TaskCard } from '@/components/ui/task-card';
 import { ToolLoading } from '@/components/ui/tool-loading';
-import type { UIMessage } from 'ai';
+import type { Message } from 'ai';
 
 interface ChatMessageProps {
-  message: UIMessage;
+  message: Message;
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
@@ -32,33 +32,32 @@ export function ChatMessage({ message }: ChatMessageProps) {
         </div>
 
         <div className="space-y-3">
-          {message.parts.map((part, index) => {
-            if (part.type === 'text') {
-              return (
-                <div key={index} className="prose prose-sm max-w-none text-foreground">
-                  <p className="whitespace-pre-wrap">{part.text}</p>
-                </div>
-              );
+          {/* Text content */}
+          {message.content && (
+            <div className="prose prose-sm max-w-none text-foreground">
+              <p className="whitespace-pre-wrap">{message.content}</p>
+            </div>
+          )}
+
+          {/* Tool invocations */}
+          {message.toolInvocations?.map((toolInvocation, index) => {
+            const { toolName, state } = toolInvocation;
+
+            if (state === 'call' || state === 'partial-call') {
+              return <ToolLoading key={index} toolName={toolName} />;
             }
 
-            if (part.type === 'tool-invocation') {
-              const { toolName, state, result } = part;
-
-              if (state === 'call' || state === 'partial-call') {
-                return <ToolLoading key={index} toolName={toolName} />;
-              }
-
-              if (state === 'result' && result) {
-                return (
-                  <div key={index} className="max-w-sm">
-                    {toolName === 'getWeather' && <WeatherCard data={result} />}
-                    {toolName === 'getStockPrice' && <StockCard data={result} />}
-                    {toolName === 'calculate' && <CalculatorCard data={result} />}
-                    {toolName === 'getDateTime' && <DateTimeCard data={result} />}
-                    {toolName === 'createTask' && <TaskCard data={result} />}
-                  </div>
-                );
-              }
+            if (state === 'result') {
+              const result = toolInvocation.result;
+              return (
+                <div key={index} className="max-w-sm">
+                  {toolName === 'getWeather' && <WeatherCard data={result} />}
+                  {toolName === 'getStockPrice' && <StockCard data={result} />}
+                  {toolName === 'calculate' && <CalculatorCard data={result} />}
+                  {toolName === 'getDateTime' && <DateTimeCard data={result} />}
+                  {toolName === 'createTask' && <TaskCard data={result} />}
+                </div>
+              );
             }
 
             return null;
