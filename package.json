@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.0.0",
+    "@ai-sdk/groq": "^1.0.0",
     "@ai-sdk/react": "^1.0.0",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-scroll-area": "^1.2.2",

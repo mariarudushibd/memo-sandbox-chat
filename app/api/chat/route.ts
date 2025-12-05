@@ -1,7 +1,8 @@
-import { openai } from '@ai-sdk/openai';
-import { streamText, Message } from 'ai';
+import { groq } from '@ai-sdk/groq';
+import { streamText, type Message } from 'ai';
 import { tools } from '@/ai/tools';
 
+// Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
     const { messages }: { messages: Message[] } = await req.json();
 
     const result = streamText({
-      model: openai('gpt-4o-mini'),
+      model: groq('deepseek-r1-distill-llama-70b'),
       system: `You are a helpful, friendly AI assistant called "Memo" with access to several tools.
 
 Your capabilities include:
@@ -28,10 +29,10 @@ Guidelines:
 6. For general questions that don't require tools, respond directly
 7. Keep responses concise but informative
 
-Remember: You can call multiple tools if needed to fully answer a question.`,
+Remember: You can call multiple tools if needed to fully answer a question. For example, if someone asks about weather in multiple cities, call the weather tool for each.`,
       messages,
       tools,
-      maxSteps: 5,
+      maxSteps: 5, // Enable multi-step tool calling
     });
 
     return result.toDataStreamResponse();
