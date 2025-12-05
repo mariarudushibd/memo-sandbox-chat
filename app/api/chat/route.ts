@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const { messages }: { messages: Message[] } = await req.json();
 
     const result = streamText({
-      model: groq('deepseek-r1-distill-llama-70b'),
+      model: groq('llama-3.3-70b-versatile'),
       system: `You are a helpful, friendly AI assistant called "Memo" with access to several tools.
 
 Your capabilities include:
@@ -32,7 +32,7 @@ Guidelines:
 Remember: You can call multiple tools if needed to fully answer a question. For example, if someone asks about weather in multiple cities, call the weather tool for each.`,
       messages,
       tools,
-      maxSteps: 5, // Enable multi-step tool calling
+      maxSteps: 5,
     });
 
     return result.toDataStreamResponse();
