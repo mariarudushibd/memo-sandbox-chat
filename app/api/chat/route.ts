@@ -1,12 +1,12 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText, convertToModelMessages, UIMessage } from 'ai';
+import { streamText, Message } from 'ai';
 import { tools } from '@/ai/tools';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const { messages }: { messages: Message[] } = await req.json();
 
     const result = streamText({
       model: openai('gpt-4o-mini'),
@@ -29,12 +29,12 @@ Guidelines:
 7. Keep responses concise but informative
 
 Remember: You can call multiple tools if needed to fully answer a question.`,
-      messages: convertToModelMessages(messages),
+      messages,
       tools,
       maxSteps: 5,
     });
 
-    return result.toUIMessageStreamResponse();
+    return result.toDataStreamResponse();
   } catch (error) {
     console.error('Chat API Error:', error);
     return new Response(
